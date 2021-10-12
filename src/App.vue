@@ -1,14 +1,19 @@
 <template>
-
-  <div id="nav">
-    <router-link to="/">Home</router-link>
-  </div>
-  <router-view />
-  
+    <ToDo/>
 </template>
 
 <script>
 
+import ToDo from "./components/ToDo.vue";
+
+import { defineComponent } from '@vue/runtime-core';
+
+export default defineComponent({
+  name: "Home",
+  components: {
+    ToDo,
+  },
+});
 </script>
 
 <style>

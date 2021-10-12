@@ -1,61 +1,43 @@
 <template>
 
   <h1>ToDo App</h1>
-    <!-- vytvoření form + přidání funkce -->
-    <!-- submit prevent - po zadání do inputu + enter, se nerefreshne stránka) -->
-    <form @submit.prevent="addTodo()"> 
-      <label>New ToDo</label>
-      <input 
-          v-model="newTodo"
-          name="newTodo" 
-          autocomplete="off"
-      >
-      <!--
-          v-model - syntax pro aktualizaci dat na inputu (zaznamená co do něj píšu)
-          name - nese hodnotu, která je v ní vložena /* OPRAVENO */
-          autocomplete - pamatování si zapsaných údajů (prohlížečem)
-       -->
-      <button>Add ToDo</button>
-    </form>
+  <!-- vytvoření form + přidání funkce -->
+  <!-- submit prevent - po zadání do inputu + enter, se nerefreshne stránka) -->
+  <form @submit.prevent="addTodo()">
+    <label>New ToDo</label>
+    <input v-model="newTodo" name="newTodo" autocomplete="off" />
+    <!--
+        v-model - syntax pro aktualizaci dat na inputu (zaznamená co do něj píšu)
+        name - nese hodnotu, která je v ní vložena /* OPRAVENO */
+        autocomplete - pamatování si zapsaných údajů (prohlížečem)
+      -->
+    <button>Add ToDo</button>
+  </form>
 
+  <h2>ToDo List</h2>
+  <ul>
 
-    <h2>ToDo List</h2>
-    <ul>
-      <li
-        v-for="(todo, index) in todos"
-        :key="index"
-      >
-      <!--
-        v-for - řetězec pro vypsání obashu (item - prvek ve zdroji, items - zdroj dat) /* OPRAVENO */
-        :key - každý výpis by měl mít unikátní "klíč", aby se nastalo že budou dva stejné výpisy - nastane error /* OPRAVENO */
-        (používá se pro string a čísla, nepoužívat pro malé hodnoty jako obejkty a pole) 
-      -->
-      <span
-        :class="{ done: todo.done }"
-        @click="doneTodo(todo)"
-      >{{ todo.content }}</span>
-      <!-- 
-        :class - pokud "todo.done" je aktivní, objeví se třída "done" /* NEOPRAVENO */
-        @click - po kliknutí se ???
-      -->
-      <button @click="removeTodo(index)">Remove</button>
-      <!--
-        po kliknutí se odstraní todo ze seznamu listů
-      -->
-      </li>
-    </ul>
+    <ToDoItem @remove="removeTodo(index)" @done="doneTodo(todo)" v-for="(todo, index) in todos" :key="index" :content="todo.content" :done="todo.done"/>
+
+  </ul>
     <h4 v-if="todos.length === 0">Empty list.</h4>
-    <!-- 
+    <!--
         pokud má todos pole (počet listů v seznamu) délku 0 =  napíše "prázdný list" /* OPRAVENO */
         todos.lenght = 0 (nastavilo by počet počet indexů v poli na 0);
-    --> 
+    -->
 
 </template>
 
 <script lang="ts">
 import { ref } from 'vue';
 
-export default {
+import ToDoItem from './ToDoItem.vue';
+import { defineComponent } from '@vue/runtime-core';
+
+export default defineComponent({
+  components: {
+      ToDoItem,
+    },
     name: 'ToDo',
     setup () {
         const newTodo = ref(''); // obsahuje co je v závorce - vypsání newTodo.value
@@ -64,7 +46,7 @@ export default {
             content: 'Write a blog post'
         }]
         // proměnná obsahující seznam
-        const todosData = JSON.parse(localStorage.getItem('todos')) || defaultData; // || = nebo
+        const todosData = JSON.parse(localStorage.getItem('todos') as any) || defaultData; // || = nebo
         // JSON.parse - vezme string a vrátí objekt
         // localStorage.getItem('') - vezme '' z lokální paměti
         const todos = ref(todosData);
@@ -76,16 +58,16 @@ export default {
                     content: newTodo.value
                 });
                 newTodo.value = '';
-                // hodnota newTodo se nastaví na '' - prázdný pole 
+                // hodnota newTodo se nastaví na '' - prázdný pole
             }
             saveData();
         }
-        function doneTodo (todo) {
+        function doneTodo (todo: { done: boolean; }) {
             todo.done = !todo.done
             // ! - označuje negaci (false) = todo.done (true) = !todo.done(false) - převede
             saveData();
         }
-        function removeTodo (index) {
+        function removeTodo (index: any) {
             todos.value.splice(index, 1);
             // splice - zamění 1. pozici (indexování) ve todos za index
             saveData();
@@ -106,12 +88,11 @@ export default {
         }
         // vracení hodnot
     }
-}
-
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style module lang="scss">
+<style lang="scss">
 
 $primaryCol: white;
 $secondaryCol: darkorchid;
